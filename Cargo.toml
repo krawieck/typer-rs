@@ -1,0 +1,9 @@
+[package]
+name = "typeracer-rs"
+version = "0.1.0"
+authors = ["krawieck"]
+edition = "2018"
+
+[dependencies]
+termion = "1.5.2"
+structopt = "0.2.15"
