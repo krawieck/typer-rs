@@ -6,6 +6,7 @@ pub struct State {
     pub current_word_index: usize,
     pub stats: Vec<Stat>,
     pub current_errors: Vec<char>,
+    pub finished: bool,
 }
 
 /// struct representing statistics for current word
@@ -26,6 +27,7 @@ impl State {
             current_word_index: 0,
             stats: vec![],
             current_errors: vec![],
+            finished: false,
         };
     }
 }
