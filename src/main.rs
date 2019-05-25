@@ -4,12 +4,40 @@ extern crate termion;
 mod args_parser;
 
 use args_parser::Args;
+
 fn main() {
+    use std::io::{stdin, stdout, Write};
     use structopt::StructOpt;
+    use termion::event::{Event, Key};
+    use termion::input::TermRead;
+    use termion::raw::IntoRawMode;
+    use termion::terminal_size;
 
     let args = Args::from_args();
     let text = get_text(&args);
     println!("{:?}", text);
+
+    let stdin = stdin();
+    let mut stdout = stdout().into_raw_mode().unwrap();
+
+
+    for s in stdin.keys() {
+        let (width, height) = terminal_size().expect("couldn't get terminal size");
+        // check if user wants to quit
+        match s {
+            Ok(Key::Ctrl('c')) => break,
+            _ => {}
+        }
+        write!(
+            stdout,
+            "{}{}",
+            termion::cursor::Goto(1, 1),
+            termion::clear::All,
+        )
+        .expect("oopsie poopsie i failed, plzzzzz senpai don't be engwy (*^_^*)");
+
+        println!("{:?} size = ({}, {})", s, width, height);
+    }
 }
 
 fn get_text(args: &Args) -> Vec<String> {
