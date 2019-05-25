@@ -2,8 +2,10 @@ extern crate structopt;
 extern crate termion;
 
 mod args_parser;
+mod state;
 
 use args_parser::Args;
+use state::State;
 
 fn main() {
     use std::io::{stdin, stdout, Write};
