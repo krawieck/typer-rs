@@ -1,4 +1,5 @@
 /// struct representing current state of the program
+#[derive(Debug)]
 pub struct State {
     /// vector containing all the text
     pub text: Vec<String>,
@@ -10,6 +11,7 @@ pub struct State {
 }
 
 /// struct representing statistics for current word
+#[derive(Debug)]
 pub struct Stat {
     /// time it took to complete this word
     pub time: f64,
