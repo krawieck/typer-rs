@@ -87,6 +87,9 @@ fn update_state(state: &mut State, input: termion::event::Key) {
             return;
         }
         Char(key) => {
+            if key == '\n' {
+                return;
+            }
             if !state.current_errors.is_empty() {
                 // if there are any errors already stacked up, add this one too and return
                 state.current_errors.push(key);
