@@ -26,7 +26,6 @@ fn main() {
         // check if user wants to quit
         match s {
             Ok(Key::Ctrl('c')) => {
-                write!(screen, "{}", termion::clear::All).unwrap();
                 break;
             }
             _ => {}
@@ -85,18 +84,24 @@ fn render(state: &State, stdout: &mut std::io::Stdout) {
 
     // Print text already written in current sentence
     if state.current_word_index > 0 {
-        for c in state.text[state.current_text_index][0..state.current_word_index].chars() {
-            write!(stdout, "{}", c).unwrap()
-        }
+        write!(
+            stdout,
+            "{}",
+            &state.text[state.current_text_index][0..state.current_word_index]
+        )
+        .unwrap();
     }
 
     let (cur_x, cur_y) = termion::cursor::DetectCursorPos::cursor_pos(stdout).unwrap();
 
-    // Print text not yet written in current sentence
-    write!(stdout, "{}", color::Bg(color::Reset)).unwrap();
-    for c in state.text[state.current_text_index][state.current_word_index..].chars() {
-        write!(stdout, "{}", c).unwrap();
-    }
+    // Reset the color and print text not yet written in current sentence
+    write!(
+        stdout,
+        "{}{}",
+        color::Bg(color::Reset),
+        &state.text[state.current_text_index][state.current_word_index..]
+    )
+    .unwrap();
 
     write!(stdout, " ").unwrap();
 
