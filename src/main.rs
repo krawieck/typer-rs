@@ -19,14 +19,14 @@ fn main() {
     println!("{:?}", text);
 
     let stdin = stdin();
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    let mut screen = termion::screen::AlternateScreen::from(stdout().into_raw_mode().unwrap());
     let mut state = State::from(text);
 
     for s in stdin.keys() {
         // check if user wants to quit
         match s {
             Ok(Key::Ctrl('c')) => {
-                write!(stdout, "{}", termion::clear::All).unwrap();
+                write!(screen, "{}", termion::clear::All).unwrap();
                 break;
             }
             _ => {}
@@ -34,9 +34,9 @@ fn main() {
         let s = s.expect("couldn't get key");
 
         state.update(s);
-        render(&state, &mut stdout);
+        render(&state, &mut screen);
 
-        stdout.flush().unwrap();
+        screen.flush().unwrap();
     }
 }
 
