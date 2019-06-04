@@ -32,4 +32,58 @@ impl State {
             finished: false,
         };
     }
+
+    pub fn update(&mut self, input: termion::event::Key) {
+        use termion::event::Key::{Backspace, Char};
+        if self.finished {
+            return;
+        }
+        match input {
+            Backspace => {
+                if self.current_errors.is_empty() {
+                    if self.current_word_index > 0 {
+                        self.current_word_index -= 1;
+                    }
+                    return;
+                }
+                self.current_errors.pop();
+                return;
+            }
+            Char(key) => {
+                if key == '\n' {
+                    return;
+                }
+                if !self.current_errors.is_empty() {
+                    // if there are any errors already stacked up, add this one too and return
+                    self.current_errors.push(key);
+                } else if self.current_word_index == self.text[self.current_text_index].len() {
+                    // space after word
+                    if key == ' ' {
+                        self.current_word_index = 0;
+                        self.current_text_index += 1;
+                    } else {
+                        self.current_errors.push(key);
+                    }
+                } else {
+                    let curr_index = self.text[self.current_text_index]
+                        .clone()
+                        .chars()
+                        .nth(self.current_word_index)
+                        .expect("failed getting current index");
+                    // word
+                    if key == curr_index {
+                        self.current_word_index += 1;
+                    } else {
+                        self.current_errors.push(key);
+                    }
+                    if self.current_text_index == self.text.len() - 1
+                        && self.current_word_index == self.text.last().unwrap().len()
+                    {
+                        self.finished = true;
+                    }
+                }
+            }
+            _ => return,
+        }
+    }
 }
