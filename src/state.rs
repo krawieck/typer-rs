@@ -33,13 +33,14 @@ impl State {
         };
     }
 
-    pub fn update(&mut self, input: termion::event::Key) {
-        use termion::event::Key::{Backspace, Char};
+    pub fn update(&mut self, input: crossterm::KeyEvent) {
+        use crossterm::{KeyEvent};
+
         if self.finished {
             return;
         }
         match input {
-            Backspace => {
+            KeyEvent::Backspace => {
                 if self.current_errors.is_empty() {
                     if self.current_word_index > 0 {
                         self.current_word_index -= 1;
@@ -49,7 +50,7 @@ impl State {
                 self.current_errors.pop();
                 return;
             }
-            Char(key) => {
+            KeyEvent::Char(key) => {
                 if key == '\n' {
                     return;
                 }

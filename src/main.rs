@@ -1,5 +1,5 @@
+extern crate crossterm;
 extern crate structopt;
-extern crate termion;
 
 mod args_parser;
 mod state;
@@ -7,36 +7,53 @@ mod state;
 use args_parser::Args;
 use state::State;
 
-fn main() {
-    use std::io::{stdin, stdout, Write};
+fn main() -> std::io::Result<()> {
+    use crossterm::{AlternateScreen, Crossterm, RawScreen};
+    use std::io::{stdout, Write};
     use structopt::StructOpt;
-    use termion::event::Key;
-    use termion::input::TermRead;
-    use termion::raw::IntoRawMode;
+
+    let alt = AlternateScreen::to_alternate(true)?;
+    let input = crossterm::input();
+
+    let crossterm = Crossterm::new();
+    let terminal = crossterm.terminal();
+    let cursor = crossterm.cursor();
 
     let args = Args::from_args();
     let text = get_text(&args);
     println!("{:?}", text);
 
-    let stdin = stdin();
-    let mut screen = termion::screen::AlternateScreen::from(stdout().into_raw_mode().unwrap());
     let mut state = State::from(text);
+    let mut stdin = input.read_sync();
+    loop {
+        // for key in input.read_async() {
+        use crossterm::{InputEvent, KeyEvent};
 
-    for s in stdin.keys() {
+        let key = stdin.next();
         // check if user wants to quit
-        match s {
-            Ok(Key::Ctrl('c')) => {
+        let key = match key {
+            Some(k) => k,
+            _ => continue,
+        };
+        let key = match key {
+            InputEvent::Keyboard(k) => k,
+            _ => continue,
+        };
+        match key {
+            KeyEvent::Ctrl('c') => {
                 break;
             }
             _ => {}
         }
-        let s = s.expect("couldn't get key");
 
-        state.update(s);
-        render(&state, &mut screen);
+        state.update(key);
+        render(&state, &terminal, &cursor)?;
 
-        screen.flush().unwrap();
+        std::io::stdout().flush()?;
+        // screen.flush().unwrap();
     }
+    alt.to_main()?;
+    Ok(())
 }
 
 fn get_text(args: &Args) -> Vec<String> {
@@ -59,67 +76,62 @@ fn get_text(args: &Args) -> Vec<String> {
     }
 }
 
-fn render(state: &State, stdout: &mut std::io::Stdout) {
-    use std::io::Write;
-    use termion::{color, cursor};
-
+fn render(
+    state: &State,
+    terminal: &crossterm::Terminal,
+    cursor: &crossterm::TerminalCursor,
+) -> std::io::Result<()> {
+    use crossterm::{style, ClearType, Color, Colored};
 
     // place cursor in starting position
-    write!(stdout, "{}{}", termion::clear::All, cursor::Goto(1, 1))
-        .expect("couldn't render to terminal");
+    terminal.clear(ClearType::All)?;
+    cursor.goto(0, 0)?;
 
     if state.finished {
-        write!(stdout, "{}", termion::clear::All).unwrap();
-        println!("you won!");
-        return;
+        terminal.clear(ClearType::All)?;
+        terminal.write("you won!")?;
+        return Ok(());
     }
 
-    write!(stdout, "{}", color::Bg(color::Green)).unwrap();
     // Print text before current word
     if state.current_text_index > 0 {
         for s in &state.text[0..state.current_text_index] {
-            write!(stdout, "{} ", s).unwrap();
+            print!("{} ", s);
         }
     }
 
     // Print text already written in current sentence
     if state.current_word_index > 0 {
-        write!(
-            stdout,
-            "{}",
-            &state.text[state.current_text_index][0..state.current_word_index]
-        )
-        .unwrap();
+        print!(
+            "{}{}",
+            Colored::Bg(Color::Green),
+            &state.text[state.current_text_index][0..state.current_word_index],
+        );
     }
-
-    let (cur_x, cur_y) = termion::cursor::DetectCursorPos::cursor_pos(stdout).unwrap();
-
+    cursor.save_position()?;
     // Reset the color and print text not yet written in current sentence
-    write!(
-        stdout,
+    print!(
         "{}{}",
-        color::Bg(color::Reset),
-        &state.text[state.current_text_index][state.current_word_index..]
-    )
-    .unwrap();
+        style("").on(Color::Reset),
+        &state.text[state.current_text_index][state.current_word_index..],
+    );
 
-    write!(stdout, " ").unwrap();
+    print!(" ");
 
     // Print text after current sentence
     if state.current_text_index != state.text.len() - 1 {
         for s in &state.text[state.current_text_index + 1..] {
-            write!(stdout, "{} ", s).unwrap();
+            print!("{} ", s);
         }
     }
 
     // print errors
-    write!(
-        stdout,
-        "{}{}{}{}",
-        termion::cursor::Goto(cur_x, cur_y),
-        color::Bg(color::Red),
+    cursor.reset_position()?;
+    print!(
+        "{}{}{}",
+        Colored::Bg(Color::Red),
         state.current_errors.iter().collect::<String>(),
-        color::Bg(color::Reset),
-    )
-    .unwrap();
+        style("").on(Color::Reset),
+    );
+    Ok(())
 }
