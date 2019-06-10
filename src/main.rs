@@ -8,8 +8,8 @@ use args_parser::Args;
 use state::State;
 
 fn main() -> std::io::Result<()> {
-    use crossterm::{AlternateScreen, Crossterm, RawScreen};
-    use std::io::{stdout, Write};
+    use crossterm::{AlternateScreen, Crossterm};
+    use std::io::Write;
     use structopt::StructOpt;
 
     let alt = AlternateScreen::to_alternate(true)?;
@@ -21,9 +21,9 @@ fn main() -> std::io::Result<()> {
 
     let args = Args::from_args();
     let text = get_text(&args);
-    println!("{:?}", text);
 
     let mut state = State::from(text);
+    render(&state, &terminal, &cursor)?;
     let mut stdin = input.read_sync();
     loop {
         // for key in input.read_async() {
