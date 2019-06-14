@@ -86,13 +86,13 @@ impl State {
                         self.stats[self.current_text_index].mistakes += 1
                     }
                 } else {
-                    let curr_index = self.text[self.current_text_index]
+                    let curr_letter = self.text[self.current_text_index]
                         .clone()
                         .chars()
                         .nth(self.current_word_index)
                         .expect("failed getting current index");
                     // word
-                    if key == curr_index {
+                    if key == curr_letter {
                         self.current_word_index += 1;
                     } else {
                         self.current_errors.push(key);
