@@ -7,3 +7,5 @@ edition = "2018"
 [dependencies]
 crossterm = "0.9.5"
 structopt = "0.2.15"
+reqwest = "0.10.0-alpha.2"
+spinners = "1.2.0"
