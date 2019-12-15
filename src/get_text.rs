@@ -7,7 +7,7 @@ pub fn get_text(args: &Args) -> Vec<String> {
         let mut s: String = String::new();
         for line in stdin.lock().lines() {
             s.push(' ');
-            s.push_str(line.unwrap_or("".to_string()).as_str());
+            s.push_str(line.unwrap_or_else(|_| "".to_string()).as_str());
         }
         drop(stdin);
         return s.split_whitespace().map(|a| a.to_string()).collect();
