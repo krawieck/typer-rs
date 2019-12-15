@@ -47,8 +47,8 @@ fn main() -> std::io::Result<()> {
             _ => continue,
         };
         if let KeyEvent::Ctrl('c') = key {
-                break;
-            }
+            break;
+        }
 
         if !state.finished {
             state.update(key);
