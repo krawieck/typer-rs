@@ -1,10 +1,9 @@
 use crate::state::State;
 
-pub fn render_game(
-    state: &State,
-    terminal: &crossterm::Terminal,
-    cursor: &crossterm::TerminalCursor,
-) -> std::io::Result<()> {
+pub fn render_game(state: &State,
+                   terminal: &crossterm::Terminal,
+                   cursor: &crossterm::TerminalCursor)
+                   -> std::io::Result<()> {
     use crossterm::{style, ClearType, Color, Colored};
 
     // place cursor in starting position
@@ -27,19 +26,15 @@ pub fn render_game(
 
     // Print text already written in current sentence
     if state.current_word_index > 0 {
-        print!(
-            "{}{}",
-            Colored::Bg(Color::Green),
-            &state.text[state.current_text_index][0..state.current_word_index],
-        );
+        print!("{}{}",
+               Colored::Bg(Color::Green),
+               &state.text[state.current_text_index][0..state.current_word_index]);
     }
     cursor.save_position()?;
     // Reset the color and print text not yet written in current sentence
-    print!(
-        "{}{}",
-        style("").on(Color::Reset),
-        &state.text[state.current_text_index][state.current_word_index..],
-    );
+    print!("{}{}",
+           style("").on(Color::Reset),
+           &state.text[state.current_text_index][state.current_word_index..]);
 
     print!(" ");
 
@@ -52,12 +47,10 @@ pub fn render_game(
 
     // print errors
     cursor.reset_position()?;
-    print!(
-        "{}{}{}",
-        Colored::Bg(Color::Red),
-        state.current_errors.iter().collect::<String>(),
-        style("").on(Color::Reset),
-    );
+    print!("{}{}{}",
+           Colored::Bg(Color::Red),
+           state.current_errors.iter().collect::<String>(),
+           style("").on(Color::Reset));
     Ok(())
 }
 
