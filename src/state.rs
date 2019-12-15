@@ -25,15 +25,13 @@ pub struct Stat {
 
 impl State {
     pub fn from(text: Vec<String>) -> State {
-        return State {
-            text: text,
-            current_text_index: 0,
-            current_word_index: 0,
-            stats: vec![],
-            current_errors: vec![],
-            finished: false,
-            timestamp: std::time::SystemTime::now(),
-        };
+        State { text,
+                current_text_index: 0,
+                current_word_index: 0,
+                stats: vec![],
+                current_errors: vec![],
+                finished: false,
+                timestamp: std::time::SystemTime::now() }
     }
 
     pub fn update(&mut self, input: crossterm::KeyEvent) {
@@ -46,11 +44,9 @@ impl State {
 
         // create instance of Stat object for current word, if not present
         if self.current_text_index == self.stats.len() {
-            self.stats.push(Stat {
-                time: std::time::Duration::new(0, 0),
-                mistakes: 0,
-                word_len: self.text[self.current_text_index].len(),
-            });
+            self.stats.push(Stat { time: std::time::Duration::new(0, 0),
+                                   mistakes: 0,
+                                   word_len: self.text[self.current_text_index].len() });
             self.timestamp = SystemTime::now()
         }
 
@@ -63,7 +59,6 @@ impl State {
                     return;
                 }
                 self.current_errors.pop();
-                return;
             }
             KeyEvent::Char(key) => {
                 if key == '\n' {
@@ -86,11 +81,11 @@ impl State {
                         self.stats[self.current_text_index].mistakes += 1
                     }
                 } else {
-                    let curr_letter = self.text[self.current_text_index]
-                        .clone()
-                        .chars()
-                        .nth(self.current_word_index)
-                        .expect("failed getting current index");
+                    let curr_letter =
+                        self.text[self.current_text_index].clone()
+                                                          .chars()
+                                                          .nth(self.current_word_index)
+                                                          .expect("failed getting current index");
                     // word
                     if key == curr_letter {
                         self.current_word_index += 1;
@@ -99,7 +94,7 @@ impl State {
                         self.stats[self.current_text_index].mistakes += 1
                     }
                     if self.current_text_index == self.text.len() - 1
-                        && self.current_word_index == self.text.last().unwrap().len()
+                       && self.current_word_index == self.text.last().unwrap().len()
                     {
                         // finished everything
                         self.stats[self.current_text_index].time =
@@ -108,7 +103,7 @@ impl State {
                     }
                 }
             }
-            _ => return,
+            _ => {}
         }
     }
 }
