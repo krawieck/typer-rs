@@ -46,12 +46,9 @@ fn main() -> std::io::Result<()> {
             InputEvent::Keyboard(k) => k,
             _ => continue,
         };
-        match key {
-            KeyEvent::Ctrl('c') => {
+        if let KeyEvent::Ctrl('c') = key {
                 break;
             }
-            _ => {}
-        }
 
         if !state.finished {
             state.update(key);
