@@ -6,11 +6,11 @@ mod get_text;
 mod render;
 mod state;
 
-use args_parser::Args;
 use get_text::get_text;
 use render::{render_game, render_stats};
 
 fn main() -> std::io::Result<()> {
+    use args_parser::Args;
     use crossterm::{AlternateScreen, Crossterm};
     use state::State;
     use std::io::Write;
