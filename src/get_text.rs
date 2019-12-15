@@ -10,12 +10,19 @@ pub fn get_text(args: &Args) -> Vec<String> {
             s.push_str(line.unwrap_or_else(|_| "".to_string()).as_str());
         }
         drop(stdin);
-        return s.split_whitespace().map(|a| a.to_string()).collect();
+
+        s.split_whitespace().map(|a| a.to_string()).collect()
+    } else if args.input != "" {
+        args.input
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect()
+    } else {
+        // @TODO HERE IT SHOULD GET RANDOM TEXT FROM SOMEWHERE
+        "That is a text that you get when you don't take from stdin!
+     It should be removed by the time anyone sees this program"
+                                                               .split_whitespace()
+                                                               .map(|a| a.to_string())
+                                                               .collect()
     }
-    // @TODO HERE IT SHOULD GET RANDOM TEXT FROM SOMEWHERE
-    "That is a text that you get when you don't take from stdin!
-        It should be removed by the time anyone sees this program"
-        .split_whitespace()
-        .map(|a| a.to_string())
-        .collect()
 }
