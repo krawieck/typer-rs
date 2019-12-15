@@ -1,5 +1,5 @@
 [package]
-name = "typeracer-rs"
+name = "typer-rs"
 version = "0.1.0"
 authors = ["krawieck"]
 edition = "2018"
