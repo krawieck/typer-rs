@@ -1,7 +1,7 @@
 use structopt::StructOpt;
 
+#[structopt(name = "typer-rs")]
 #[derive(StructOpt, Debug)]
-#[structopt(name = "ez-renamer")]
 pub struct Args {
     /// take text from stdin
     #[structopt(name = "-")]
